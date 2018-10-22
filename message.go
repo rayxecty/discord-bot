@@ -12,15 +12,6 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-func init() {
-	messageInit()
-}
-
-func messageInit() error {
-	
-	return nil
-}
-
 // 投稿されたメッセージのチェック
 func checkMessage(s *discordgo.Session, m *discordgo.MessageCreate, c *discordgo.Channel) {
 	//  botのメッセージには反応しない
