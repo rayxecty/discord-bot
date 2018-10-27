@@ -8,7 +8,7 @@ import (
 	"os"
 	"strings"
 	"time"
-	
+
 	"github.com/bwmarrin/discordgo"
 )
 
@@ -25,10 +25,12 @@ func checkMessage(s *discordgo.Session, m *discordgo.MessageCreate, c *discordgo
 	}
 
 	switch {
-		case strings.HasPrefix(m.Content, fmt.Sprintf("%s %s", appConfig.BotName, "おはよう")):
-			sendMessage(s, c, fmt.Sprintf("%s おはよう、%s。", createMention(m.Author), m.Author.Username))
-		default :
-			sendRandomMessage(s, c)
+	case strings.HasPrefix(m.Content, fmt.Sprintf("%s %s", appConfig.BotName, "おはよう")):
+		sendMessage(s, c, fmt.Sprintf("%s おはよう、%s。", createMention(m.Author), m.Author.Username))
+	case strings.HasPrefix(strings.ToLower(m.Content), fmt.Sprintf("%s %s", appConfig.BotName, "mtg")):
+		sendRandomCommanderCard(s, c)
+	default:
+		sendRandomMessage(s, c)
 	}
 }
 
@@ -56,7 +58,7 @@ func sendRandomMessage(s *discordgo.Session, c *discordgo.Channel) {
 }
 
 // メンションを作成する
-func createMention(user *discordgo.User) (string) {
+func createMention(user *discordgo.User) string {
 	return fmt.Sprintf("<@%s>", user.ID)
 }
 
@@ -73,16 +75,15 @@ func createRandomMessageList() ([]string, error) {
 
 	// テキスト内の各行の文字列を単一のメッセージとする
 	s := bufio.NewScanner(f)
-    for s.Scan() {
+	for s.Scan() {
 		log.Println(s.Text())
 		msgList = append(msgList, s.Text())
 	}
-	
-    if s.Err() != nil {
-        // non-EOF error.
-        fmt.Println(s.Err())
-    }
+
+	if s.Err() != nil {
+		// non-EOF error.
+		fmt.Println(s.Err())
+	}
 
 	return msgList, nil
 }
-
