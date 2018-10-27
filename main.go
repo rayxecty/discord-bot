@@ -41,8 +41,6 @@ func settingInit() error {
 }
 
 func main() {
-	fmt.Printf("Hello, world!!!\n")
-
 	discord, err := discordgo.New()
 	discord.Token = appConfig.DiscordBotToken
 	if err != nil {
