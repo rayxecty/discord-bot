@@ -6,21 +6,24 @@ import (
 	"io/ioutil"
 	"log"
 	"time"
-	
+
 	"github.com/bwmarrin/discordgo"
 )
-var(
-    stopBot = make(chan bool)
+
+var (
+	stopBot   = make(chan bool)
 	vcsession *discordgo.VoiceConnection
-	
-	appConfig AppConfig
+
+	appConfig         AppConfig
 	RandomMessageList []string
 )
 
 // AppConfig 設定秘匿情報
 type AppConfig struct {
-	DiscordBotToken	string `json:"bot_token"`
-	BotName			string `json:"bot_name"`
+	DiscordBotToken       string `json:"bot_token"`
+	BotName               string `json:"bot_name"`
+	SpreadsheetId         string `json:"spreadsheet_id"`
+	SpreadsheetSecretPath string `json:"spreadsheet_secret_path"`
 }
 
 func init() {
@@ -36,7 +39,7 @@ func settingInit() error {
 	json.Unmarshal(appConfigJSON, &appConfig)
 
 	fmt.Println(appConfig)
-	
+
 	return nil
 }
 
@@ -72,4 +75,3 @@ func onMessageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 	checkMessage(s, m, c)
 }
-
