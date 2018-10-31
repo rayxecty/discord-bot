@@ -32,7 +32,7 @@ func sendJapaneseCard(c *mtg.Card) string {
 	var msg string
 	cardInfo := getJapaneseCardInfo(c)
 
-	fmt.Println(cardInfo)
+	log.Println(cardInfo)
 
 	msg += cardInfo.Name + "\n"
 	if !cardInfo.IsJapanese {
@@ -48,24 +48,31 @@ func sendJapaneseCard(c *mtg.Card) string {
 
 // 日本語のカード画像を取得
 func getJapaneseCardInfo(c *mtg.Card) CardInfo {
-	fmt.Println(c)
+	log.Println(c)
 	ret := findJapaneseCardInfo(c)
 	if !ret.IsJapanese {
-		fmt.Println("日本語がないセットのカードです")
 		// 取得したカード名で日本語の情報があるカードを検索
 		cards, err := mtg.NewQuery().Where(mtg.CardName, c.Name).All()
 		if err != nil {
 			log.Panic(err)
 		}
-		fmt.Println(fmt.Sprintf("同名カードが%d枚存在します", len(cards)))
+		log.Println(fmt.Sprintf("%s は %d 枚存在します", c.Name, len(cards)))
+
 		if len(cards) > 0 {
 			for _, card := range cards {
+				if card.Name != c.Name {
+					log.Println(card.Name + " is not " + c.Name)
+					continue
+				}
 				ret = findJapaneseCardInfo(card)
 				if ret.IsJapanese {
-					break
+					if ret.MultiverseId != 0 {
+						break
+					} else {
+						continue
+					}
 				}
 			}
-
 		}
 	}
 
@@ -73,16 +80,16 @@ func getJapaneseCardInfo(c *mtg.Card) CardInfo {
 }
 
 // 日本語のカード情報を探索
-func findJapaneseCardInfo(card *mtg.Card) CardInfo {
+func findJapaneseCardInfo(c *mtg.Card) CardInfo {
 	var ret CardInfo
-	foreignNames := card.ForeignNames
+	foreignNames := c.ForeignNames
 
 	// 日本語のカード情報を取得
 	var japaneseCard mtg.ForeignCardName
 	for _, fn := range foreignNames {
 		if fn.Language == "Japanese" {
 			japaneseCard = fn
-			fmt.Println(japaneseCard)
+			log.Println(japaneseCard)
 		}
 	}
 
@@ -93,9 +100,10 @@ func findJapaneseCardInfo(card *mtg.Card) CardInfo {
 		ret.IsJapanese = true
 	} else {
 		// 日本語の情報がない場合、オリジナル(英語)のカード情報を返還
-		ret.Name = card.Name
-		ret.MultiverseId = uint(card.MultiverseId)
-		ret.ImageUrl = card.ImageUrl
+		log.Println(c.SetName + " は日本語版がありません")
+		ret.Name = c.Name
+		ret.MultiverseId = uint(c.MultiverseId)
+		ret.ImageUrl = c.ImageUrl
 		ret.IsJapanese = false
 	}
 
