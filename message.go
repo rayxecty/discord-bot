@@ -48,7 +48,7 @@ func sendMessage(s *discordgo.Session, c *discordgo.Channel, msg string) {
 func sendRandomMessage(s *discordgo.Session, c *discordgo.Channel) {
 	l, err := createRandomMessageList()
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 	}
 	rand.Seed(time.Now().UnixNano())
 	len := len(l)
@@ -69,7 +69,7 @@ func createRandomMessageList() ([]string, error) {
 
 	f, err := os.Open("./configs/randomMessages.txt")
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return msgList, err
 	}
 
@@ -82,7 +82,7 @@ func createRandomMessageList() ([]string, error) {
 
 	if s.Err() != nil {
 		// non-EOF error.
-		fmt.Println(s.Err())
+		log.Println(s.Err())
 	}
 
 	return msgList, nil

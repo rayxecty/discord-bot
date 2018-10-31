@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"os"
 	"time"
 
 	"github.com/bwmarrin/discordgo"
@@ -16,6 +17,7 @@ var (
 
 	appConfig         AppConfig
 	RandomMessageList []string
+	logfilePath       = "./log/discord-bot.log"
 )
 
 // AppConfig 設定秘匿情報
@@ -44,21 +46,29 @@ func settingInit() error {
 }
 
 func main() {
+	f, err := os.OpenFile(logfilePath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
+	if err != nil {
+		panic("cannnot open " + logfilePath + ":" + err.Error())
+	}
+	defer f.Close()
+
+	log.SetOutput(f)
+
 	discord, err := discordgo.New()
 	discord.Token = appConfig.DiscordBotToken
 	if err != nil {
-		fmt.Println("Error logging in")
-		fmt.Println(err)
+		log.Println("Error logging in")
+		log.Println(err)
 	}
 
 	discord.AddHandler(onMessageCreate)
 	// websocket
 	err = discord.Open()
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 	}
 
-	fmt.Println("Listening...")
+	log.Println("Listening...")
 	<-stopBot
 
 	return
