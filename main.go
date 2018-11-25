@@ -5,10 +5,13 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"net/http"
 	"os"
 	"time"
 
 	"github.com/bwmarrin/discordgo"
+	"golang.org/x/oauth2"
+	"golang.org/x/oauth2/google"
 )
 
 var (
@@ -43,6 +46,19 @@ func settingInit() error {
 	fmt.Println(appConfig)
 
 	return nil
+}
+
+func httpClient(credentialFilePath string) (*http.Client, error) {
+	data, err := ioutil.ReadFile(credentialFilePath)
+	if err != nil {
+		return nil, err
+	}
+	conf, err := google.JWTConfigFromJSON(data, "https://www.googleapis.com/auth/spreadsheets")
+	if err != nil {
+		return nil, err
+	}
+
+	return conf.Client(oauth2.NoContext), nil
 }
 
 func main() {
