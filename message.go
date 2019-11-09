@@ -28,7 +28,8 @@ func checkMessage(s *discordgo.Session, m *discordgo.MessageCreate, c *discordgo
 
 	switch {
 	case strings.HasPrefix(strings.ToLower(m.Content), fmt.Sprintf("%s %s", appConfig.BotName, "mtg")):
-		sendRandomCommanderCard(s, c)
+		// sendRandomCommanderCard(s, c)
+		sendRandomCard(s, c)
 	default:
 		sendGSSMessage(s, m, c)
 	}

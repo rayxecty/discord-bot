@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"net/http"
 
 	"github.com/MagicTheGathering/mtg-sdk-go"
 	"github.com/bwmarrin/discordgo"
@@ -13,6 +14,27 @@ type CardInfo struct {
 	MultiverseId uint
 	ImageUrl     string
 	IsJapanese   bool
+}
+
+// ランダムにカードを送信する
+func sendRandomCard(s *discordgo.Session, c *discordgo.Channel) {
+	// ランダムに表示させるURLをリクエスト
+	target_url := "http://gatherer.wizards.com/Pages/Card/Details.aspx?action=random"
+	req, _ := http.NewRequest("GET", target_url, nil)
+	client := new(http.Client)
+	resp, _ := client.Do(req)
+
+	// レスポンスからクエリを取得
+	raw_query := resp.Request.URL.RawQuery
+	defer resp.Body.Close()
+
+	// カードのみを表示するURLを作成
+	base_url := "https://gatherer.wizards.com/Handlers/Image.ashx"
+	randomcard_url := base_url + "?" + raw_query + "&type=card"
+	fmt.Println(randomcard_url)
+
+	// URLを送信
+	sendMessage(s, c, randomcard_url)
 }
 
 // ランダムに統率者カードを送信する
